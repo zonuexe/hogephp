@@ -90,15 +90,8 @@ final class Framework
                         'Content-Length' => filesize($path)
                     ],
                     'body' => new class ($path) {
-                        public function __construct($path)
-                        {
-                            $this->path = $path;
-                        }
-
-                        public function __toString()
-                        {
-                            return file_get_contents($this->path);
-                        }
+                        function __construct($path) {$this->path = $path;}
+                        function __toString() {return file_get_contents($this->path);}
                     }
                 ];
             }
