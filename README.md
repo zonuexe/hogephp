@@ -4,7 +4,7 @@
 
 ```php
 <?= (require __DIR__ . '/../Hoge.php')(function (Hoge\Framework $php) {
-    $php->get('/', [], function () { ?>
+    $php->get('/', function () { ?>
 <!DOCTYPE html>
 <html>
 <title>Hoge index</title>

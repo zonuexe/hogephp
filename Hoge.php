@@ -23,10 +23,9 @@ final class Framework
     {
         if (in_array($name, ['get', 'post', 'put', 'delete'], true)) {
             $path = array_shift($args);
-            $params = array_shift($args);
             $callback = array_shift($args);
 
-            return $this->addRoute($name, $path, $params, $callback);
+            return $this->addRoute($name, $path, $callback);
         }
     }
 
@@ -127,9 +126,8 @@ final class Framework
 
     /**
      * @param string $path
-     * @param array<string,string> $params
      */
-    public function addRoute($method, $path, array $params, Closure $callback)
+    public function addRoute($method, $path, Closure $callback)
     {
         $this->static_routes[strtoupper($method)][$path] = $callback;
     }
