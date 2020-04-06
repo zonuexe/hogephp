@@ -19,7 +19,7 @@ final class Framework
         'DELETE' => [],
     ];
 
-    public function __call($name, $args)
+    public function __call(string $name, array $args)
     {
         if (in_array($name, ['get', 'post', 'put', 'delete'], true)) {
             $path = array_shift($args);
@@ -32,7 +32,7 @@ final class Framework
     public function __construct(array $server, string $docroot)
     {
         $this->docroot = $docroot;
-        $this->notfound = static fn() => [404, [], '404 NotFound'] ;
+        $this->notfound = static fn() => [404, [], '<h1>404 NotFound</h1>'] ;
         $this->method = $server['REQUEST_METHOD'];
         $this->uri = parse_url($server['REQUEST_URI'], PHP_URL_PATH);
     }
@@ -40,7 +40,6 @@ final class Framework
     public function __invoke(Closure $callback)
     {
         $callback($this);
-
         $response = $this->dispatch($this->method, $this->uri);
 
         http_response_code($response['status']);
@@ -113,9 +112,9 @@ final class Framework
         if ($result === null) {
             $response['body'] = $output;
         } elseif (is_array($result)) {
-            $response['status'] = $result['status'] ?? $default_status;
-            $response['headers'] = $result['headers'] ?? [];
-            $response['body'] = $result['body'] ?? '';
+            $response['status'] = $result['status'] ?? $result[0] ?? $default_status;
+            $response['headers'] = $result['headers'] ?? $result[1] ?? [];
+            $response['body'] = $result['body'] ?? $result[2] ?? '';
         } else {
             $response['body'] = (string)$result;
             $response['headers']['Content-Length'] = strlen($response['body']);
@@ -124,10 +123,7 @@ final class Framework
         return $response;
     }
 
-    /**
-     * @param string $path
-     */
-    public function addRoute($method, $path, Closure $callback)
+    public function addRoute(string $method, string $path, Closure $callback): void
     {
         $this->static_routes[strtoupper($method)][$path] = $callback;
     }
