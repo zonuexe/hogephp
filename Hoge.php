@@ -18,6 +18,9 @@ final class Framework
         'PUT' => [],
         'DELETE' => [],
     ];
+    public array $exclude_patterns = [
+        '@/\.ht@', // .htaccess and .htpasswd
+    ];
 
     public function __call(string $name, array $args)
     {
@@ -81,6 +84,12 @@ final class Framework
         if ($callback === false && $method === 'GET') {
             $path = $this->docroot . $uri;
             if (is_file($path)) {
+                foreach ($this->exclude_patterns as $pattern) {
+                    if (preg_match($pattern, $path)) {
+                        goto excluded;
+                    }
+                }
+
                 $callback = static fn () => [
                     'status' => 200,
                     'headers' => [
@@ -93,6 +102,7 @@ final class Framework
                     }
                 ];
             }
+            excluded:
         }
 
         if ($callback === false) {
